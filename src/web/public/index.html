@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Submodule Manager - Web Interface</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1>🔧 Git Submodule Manager</h1>
+            <div class="header-actions">
+                <span id="readonly-badge" class="badge hidden">只读模式</span>
+                <button id="refresh-btn" class="btn btn-secondary">
+                    <span class="icon">🔄</span> 刷新
+                </button>
+            </div>
+        </header>
+
+        <!-- 状态栏 -->
+        <div id="status-bar" class="status-bar hidden">
+            <span class="status-message"></span>
+            <button class="close-btn" onclick="this.parentElement.classList.add('hidden')">×</button>
+        </div>
+
+        <!-- 操作面板 -->
+        <div class="action-panel">
+            <button id="add-btn" class="btn btn-primary">
+                <span class="icon">➕</span> 添加子模块
+            </button>
+            <button id="update-all-btn" class="btn btn-secondary">
+                <span class="icon">⬆️</span> 更新全部
+            </button>
+            <button id="sync-btn" class="btn btn-secondary">
+                <span class="icon">🔄</span> 同步
+            </button>
+            <button id="analyze-btn" class="btn btn-secondary">
+                <span class="icon">📊</span> 分析
+            </button>
+            <button id="health-check-btn" class="btn btn-secondary">
+                <span class="icon">🏥</span> 健康检查
+            </button>
+        </div>
+
+        <!-- 统计信息 -->
+        <div id="stats" class="stats-panel hidden">
+            <div class="stat-item">
+                <span class="stat-label">总计</span>
+                <span class="stat-value" id="total-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">最新</span>
+                <span class="stat-value" id="uptodate-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">已修改</span>
+                <span class="stat-value" id="modified-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">未初始化</span>
+                <span class="stat-value" id="notinit-count">0</span>
+            </div>
+        </div>
+
+        <!-- 子模块列表 -->
+        <div class="submodules-section">
+            <h2>子模块列表</h2>
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <span>加载中...</span>
+            </div>
+            <div id="submodules-list" class="submodules-list">
+                <!-- 动态填充 -->
+            </div>
+            <div id="empty-state" class="empty-state hidden">
+                <p>📦 还没有子模块</p>
+                <p class="text-muted">点击"添加子模块"开始</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加子模块模态框 -->
+    <div id="add-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加子模块</h3>
+                <button class="close-btn" onclick="closeModal('add-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-form">
+                    <div class="form-group">
+                        <label for="add-url">仓库URL *</label>
+                        <input type="text" id="add-url" class="form-control" placeholder="https://github.com/user/repo.git" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-path">路径 *</label>
+                        <input type="text" id="add-path" class="form-control" placeholder="path/to/submodule" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-branch">分支（可选）</label>
+                        <input type="text" id="add-branch" class="form-control" placeholder="main">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="add-force">
+                            强制添加（覆盖已存在）
+                        </label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">添加</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('add-modal')">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情模态框 -->
+    <div id="detail-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="detail-title">子模块详情</h3>
+                <button class="close-btn" onclick="closeModal('detail-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="detail-content">
+                    <!-- 动态填充 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分析结果模态框 -->
+    <div id="analysis-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>分析结果</h3>
+                <button class="close-btn" onclick="closeModal('analysis-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="analysis-content">
+                    <!-- 动态填充 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 健康检查模态框 -->
+    <div id="health-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>健康检查</h3>
+                <button class="close-btn" onclick="closeModal('health-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="health-content">
+                    <!-- 动态填充 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

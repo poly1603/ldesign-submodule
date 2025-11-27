@@ -1,0 +1,40 @@
+# 开发文件
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+__tests__
+__mocks__
+coverage
+.nyc_output
+
+# 配置文件
+.vscode
+.idea
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.swp
+*.swo
+*~
+.tmp
+
+# 文档草稿
+docs/drafts
+
+# 开发工具
+.husky
+.git
+.gitignore
+.eslintrc.js
+.prettierrc
+jest.config.js
+tsconfig.json
+
+# 但是保留这些重要文件
+!src/web/public/**
